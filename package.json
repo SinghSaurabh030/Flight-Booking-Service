@@ -4,7 +4,7 @@
   "description": "Booking Microservice for Flight Project",
   "main": "index.js",
   "scripts": {
-    "start" : "npx nodemon src/index.js"
+    "start": "npx nodemon src/index.js"
   },
   "author": "Saurabh Singh",
   "license": "ISC",
@@ -12,6 +12,7 @@
     "body-parser": "^1.20.2",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "http-status-codes": "^2.3.0",
     "morgan": "^1.10.0",
     "mysql2": "^3.10.3",
     "nodemon": "^3.1.4",
