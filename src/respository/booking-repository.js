@@ -25,10 +25,25 @@ class BookingRepository{
             if(data.status){
                 Booking.status=data.status;
             }
+
             await Booking.save();
             return Booking;
 
 
+        } catch (error) {
+            console.log(error);
+            throw new AppError(
+                'RepositoryError',
+                'Cannot create booking',
+                'there was some issue please try again later',
+                StatusCodes.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+    async getById(bookingId){
+        try {
+            const Booking=await booking.findByPk(bookingId);
+            return Booking;
         } catch (error) {
             console.log(error);
             throw new AppError(

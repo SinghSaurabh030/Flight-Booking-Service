@@ -4,6 +4,7 @@ const router=express.Router();
 
 
 router.post('/bookings',bookingController.createBooking);
+router.post('/bookings/cancel/:id',bookingController.cancelBooking);
 
 
 

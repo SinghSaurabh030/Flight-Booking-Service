@@ -40,5 +40,34 @@ class BookingService{
             throw new ServiceError();
         }
     }
+    async cancelBooking(bookingId){
+        try {
+
+            const Booking=await this.bookingRepository.getById(bookingId);
+
+            const flightGetUrl=`http://localhost:3000/api/v1/flights/${Booking.flightId}`;
+            const response=await axios.get(flightGetUrl);
+            const flightData=response.data.data;
+
+
+            const flightUpdateUrl=`http://localhost:3000/api/v1/flights/${Booking.flightId}`;
+            await axios.patch(flightUpdateUrl,
+                {
+                    totalSeats:flightData.totalSeats+Booking.noOfSeats
+                }
+            );
+
+            const finalBooking=await this.bookingRepository.update(bookingId,{status:"Cancelled"});
+            return finalBooking;
+
+        } catch (error) {
+            console.log(error);
+            if(error.name=='RepositoryError' || error.name=='SequelizeValidationError'){
+                throw error;
+            }
+
+            throw new ServiceError();
+        }
+    }
 }
  module.exports=BookingService;
