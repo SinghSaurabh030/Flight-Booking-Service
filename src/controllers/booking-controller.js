@@ -1,48 +1,67 @@
 const { StatusCodes } = require("http-status-codes");
 const { BookingService } = require("../services");
+const { createChannel, publishMessage } = require("../utils/messageQueue");
+const { REMAINDER_BINDING_KEY } = require("../config/serverConfig");
 
 
 const bookingService=new BookingService;
-
-const createBooking=async (req,res)=>{
-    try {
-        const response=await bookingService.createBooking(req.body);
-        return res.status(StatusCodes.OK).json({
-            success:true,
-            err:{},
-            data:response,
-            message:'successfully booked the flight'
-        });
-    } catch (error) {
-        return res.status(error.statusCode).json({
-            success:false,
-            err:error.explanation,
-            data:{},
-            message:error.message
-        });
+class BookingController{
+    async publishToQueue(req,res) {
+        try {
+            const channel=await createChannel();
+            const data={message:"success"};
+            publishMessage(channel,REMAINDER_BINDING_KEY,JSON.stringify(data));
+            return res.status(200).json({
+                success:true,
+                err:{},
+                data:data,
+                message:'successfully published to the queue'
+            });
+        } catch (error) {
+            return res.status(500).json({
+                success:false,
+                err:error,
+                data:{},
+                message:"cant publish"
+            });
+        }
     }
-}
-
-const cancelBooking=async (req,res)=>{
-    try {
-        const response=await bookingService.cancelBooking(req.params.id);
-        return res.status(StatusCodes.OK).json({
-            success:true,
-            err:{},
-            data:response,
-            message:'successfully cancelled the flight'
-        });
-    } catch (error) {
-        return res.status(error.statusCode).json({
-            success:false,
-            err:error.explanation,
-            data:{},
-            message:error.message
-        });
+    async createBooking (req,res){
+        try {
+            const response=await bookingService.createBooking(req.body);
+            return res.status(StatusCodes.OK).json({
+                success:true,
+                err:{},
+                data:response,
+                message:'successfully booked the flight'
+            });
+        } catch (error) {
+            return res.status(error.statusCode).json({
+                success:false,
+                err:error.explanation,
+                data:{},
+                message:error.message
+            });
+        }
     }
+    async cancelBooking(req,res){
+        try {
+            const response=await bookingService.cancelBooking(req.params.id);
+            return res.status(StatusCodes.OK).json({
+                success:true,
+                err:{},
+                data:response,
+                message:'successfully cancelled the flight'
+            });
+        } catch (error) {
+            return res.status(error.statusCode).json({
+                success:false,
+                err:error.explanation,
+                data:{},
+                message:error.message
+            });
+        }
+    }
+    
 }
-
-module.exports={
-    createBooking,
-    cancelBooking
-}
+module.exports=BookingController;
