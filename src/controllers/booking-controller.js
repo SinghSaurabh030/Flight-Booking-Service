@@ -9,12 +9,20 @@ class BookingController{
     async publishToQueue(req,res) {
         try {
             const channel=await createChannel();
-            const data={message:"success"};
-            publishMessage(channel,REMAINDER_BINDING_KEY,JSON.stringify(data));
+            const payload={
+                data:{
+                    subject:"from rabbitmq",
+                    content:"this is queue checker",
+                    recepientEmail:"singh.saurabh2250@gmail.com",
+                    notificationTime:new Date()
+                },
+                type:"NOTIFICATION"
+            };
+            publishMessage(channel,REMAINDER_BINDING_KEY,JSON.stringify(payload));
             return res.status(200).json({
                 success:true,
                 err:{},
-                data:data,
+                data:payload,
                 message:'successfully published to the queue'
             });
         } catch (error) {
